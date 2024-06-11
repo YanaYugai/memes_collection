@@ -1,4 +1,7 @@
-from fastapi import FastAPI
+from typing import Annotated
+
+from fastapi import Depends, FastAPI, File
+from schemas import MemePostModel, MemePostResponseModel
 
 app = FastAPI()
 
@@ -9,20 +12,23 @@ def get_memes():
 
 
 @app.get("/memes/{memes_id}")
-def get_meme_by_id(memes_id: int):
+def get_meme_by_id(meme_id: int):
     pass
 
 
-@app.post("/memes/")
-def create_meme():
+@app.post("/memes/", response_model=MemePostResponseModel)
+def create_meme(
+    file: Annotated[bytes, File()],
+    meme: MemePostModel = Depends(),
+):
     pass
 
 
 @app.put("/memes/{memes_id}")
-def change_meme(memes_id: int):
+def change_meme(meme_id: int):
     pass
 
 
 @app.delete("/memes/{memes_id}")
-def delete_meme(memes_id: int):
+def delete_meme(meme_id: int):
     pass
