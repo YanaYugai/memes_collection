@@ -17,6 +17,27 @@ def create_random_meme(db) -> Meme:
     return create_meme(session=db, meme_data=meme_in)
 
 
+def test_get_memes(
+    db,
+    client,
+):
+    response = client.get(
+        url="/memes/",
+    )
+    content = response.json()
+    len_memes_before = len(content)
+    assert response.status_code == 200
+    create_random_meme(db)
+    create_random_meme(db)
+    response_after = client.get(
+        url="/memes/",
+    )
+    content_after = response_after.json()
+    len_memes_after = len(content_after)
+    assert response.status_code == 200
+    assert (len_memes_after - len_memes_before) == 2
+
+
 def test_get_meme(
     db,
     client,
