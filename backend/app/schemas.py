@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class MemePostModel(BaseModel):
@@ -7,4 +7,5 @@ class MemePostModel(BaseModel):
 
 class MemePostResponseModel(MemePostModel):
     id: int
-    image: str
+    # image: str
+    model_config = ConfigDict(from_attributes=True)
