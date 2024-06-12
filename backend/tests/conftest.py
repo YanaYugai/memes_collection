@@ -20,7 +20,6 @@ def db() -> Generator:
 
 def create_tables():
     models.Base.metadata.create_all(bind=engine)
-    print("OK")
 
 
 @pytest.fixture(scope="module")
