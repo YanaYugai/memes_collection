@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, FastAPI
 
-from backend.app.schemas import MemePostModel, MemePostResponseModel
+from backend.app.schemas import MemePostModel, MemePostResponseModel, checker
 from backend.crud import (
     create_meme,
     delete_meme,
@@ -55,7 +55,7 @@ def retrieve_memes(session: AnnotatedSession):
 def post_meme(
     session: AnnotatedSession,
     # file: Image,
-    text: MemePostModel = Depends(),
+    text: MemePostModel = Depends(checker),
 ):
     # minio_handler.put_file(file.filename, file.file, file.size)
     # file_path = f"{minio_handler.client._base_url}/
@@ -68,14 +68,14 @@ def post_meme(
 def change_meme(
     session: AnnotatedSession,
     meme_id: int,
-    text: MemePostModel = Depends(),
+    text: MemePostModel = Depends(checker),
 ):
     return put_meme(session=session, meme_data=text, meme_id=meme_id)
 
 
-@router.delete("/{meme_id}/")
+@router.delete("/{meme_id}/", status_code=204)
 def delete_meme_api(session: AnnotatedSession, meme_id: int):
-    return delete_meme(session=session, meme_id=meme_id)
+    delete_meme(session=session, meme_id=meme_id)
 
 
 app.include_router(router)

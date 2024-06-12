@@ -1,4 +1,5 @@
 import http
+import json
 import random
 import string
 
@@ -63,8 +64,8 @@ def test_post_meme(
     client,
 ) -> None:
     text = random_lower_string()
-    data = {"text": text}
-    response = client.post(url="/memes/", json=data)
+    data = {"data": json.dumps({"text": text})}
+    response = client.post(url="/memes/", data=data)
     response_data = response.json()
     assert response.status_code == http.HTTPStatus.OK
     assert "id" in response_data
@@ -74,8 +75,8 @@ def test_post_meme(
 def test_update_meme(client, db):
     meme = create_random_meme(db=db)
     new_text = random_lower_string()
-    data = {"text": new_text}
-    response = client.put(url=f"/memes/{meme.id}/", json=data)
+    data = {"data": json.dumps({"text": new_text})}
+    response = client.put(url=f"/memes/{meme.id}/", data=data)
     response_data = response.json()
     assert response.status_code == http.HTTPStatus.OK
     assert new_text == response_data["text"]
@@ -85,9 +86,10 @@ def test_update_meme_not_found(
     client,
 ) -> None:
     new_text = random_lower_string()
-    data = {"text": new_text}
-    response = client.put(url="/memes/999/", json=data)
+    data = {"data": json.dumps({"text": new_text})}
+    response = client.put(url="/memes/999/", data=data)
     response_data = response.json()
+    print(response_data)
     assert response.status_code == http.HTTPStatus.NOT_FOUND
     assert response_data["detail"] == "Meme not found"
 
