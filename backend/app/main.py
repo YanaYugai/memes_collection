@@ -1,7 +1,8 @@
 import os
+from typing import Annotated, cast
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, FastAPI
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, UploadFile
 
 from backend.app.schemas import MemePostModel, MemePostResponseModel, checker
 from backend.crud import (
@@ -12,20 +13,21 @@ from backend.crud import (
     put_meme,
 )
 from backend.database import AnnotatedSession
+from backend.images.minio import MinioHandler
 
 load_dotenv()
 
-ENDPOINT = os.getenv("URL")
-ACCESS_KEY = os.getenv("ACCESS_KEY")
-SECRET_KEY = os.getenv("SECRET_KEY")
-BUCKET = os.getenv("BUCKET")
+ENDPOINT = cast(str, os.getenv("ENDPOINT"))
+ACCESS_KEY = cast(str, os.getenv("ACCESS_KEY"))
+SECRET_KEY = cast(str, os.getenv("SECRET_KEY"))
+BUCKET = cast(str, os.getenv("BUCKET"))
 
 
 app = FastAPI()
 
 router = APIRouter(prefix="/memes")
 
-"""
+
 def check_content_type(image: UploadFile):
     if image.content_type not in ["image/png", "image/jpeg", "image/tiff"]:
         raise HTTPException(400, detail="Invalid document type")
@@ -36,13 +38,11 @@ Image = Annotated[UploadFile, Depends(check_content_type)]
 
 
 minio_handler = MinioHandler(ENDPOINT, ACCESS_KEY, SECRET_KEY, BUCKET)
-"""
 
 
 @router.get("/{meme_id}/")
 def get_meme_by_id(session: AnnotatedSession, meme_id: int):
     meme = get_meme_by_id_or_error(session=session, meme_id=meme_id)
-    # minio_handler.download_file(meme.image)
     return meme
 
 
@@ -54,13 +54,11 @@ def retrieve_memes(session: AnnotatedSession):
 @router.post("/", response_model=MemePostResponseModel)
 def post_meme(
     session: AnnotatedSession,
-    # file: Image,
+    file: Image,
     text: MemePostModel = Depends(checker),
 ):
-    # minio_handler.put_file(file.filename, file.file, file.size)
-    # file_path = f"{minio_handler.client._base_url}/
-    # {minio_handler.bucket}/{file.filename}"
-    meme = create_meme(session=session, meme_data=text)
+    url = minio_handler.put_file(file.filename, file.file, file.size)
+    meme = create_meme(session=session, meme_data=text, image=url)
     return meme
 
 
@@ -68,14 +66,20 @@ def post_meme(
 def change_meme(
     session: AnnotatedSession,
     meme_id: int,
+    file: Image,
     text: MemePostModel = Depends(checker),
 ):
-    return put_meme(session=session, meme_data=text, meme_id=meme_id)
+    meme = get_meme_by_id_or_error(session=session, meme_id=meme_id)
+    minio_handler.remove_file(meme.image)
+    url = minio_handler.put_file(file.filename, file.file, file.size)
+    return put_meme(session=session, meme_data=text, meme=meme, image=url)
 
 
 @router.delete("/{meme_id}/", status_code=204)
 def delete_meme_api(session: AnnotatedSession, meme_id: int):
-    delete_meme(session=session, meme_id=meme_id)
+    meme = get_meme_by_id_or_error(session=session, meme_id=meme_id)
+    minio_handler.remove_file(meme.image)
+    delete_meme(session=session, meme=meme)
 
 
 app.include_router(router)

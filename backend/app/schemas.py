@@ -9,7 +9,7 @@ class MemePostModel(BaseModel):
 
 class MemePostResponseModel(MemePostModel):
     id: int
-    # image: str
+    image: str
     model_config = ConfigDict(from_attributes=True)
 
 

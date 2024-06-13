@@ -18,8 +18,8 @@ def get_memes(session: Session):
     return memes
 
 
-def create_meme(session: Session, meme_data: MemePostModel):
-    meme = Meme(**meme_data.model_dump())
+def create_meme(session: Session, meme_data: MemePostModel, image: str):
+    meme = Meme(**meme_data.model_dump(), image=image)
     session.add(meme)
     session.commit()
     session.refresh(meme)
@@ -29,22 +29,18 @@ def create_meme(session: Session, meme_data: MemePostModel):
 def put_meme(
     session: Session,
     meme_data: MemePostModel,
-    meme_id: int,
-    # image: str,
+    meme: Meme,
+    image: str,
 ):
-    meme = session.query(Meme).where(Meme.id == meme_id)
-    meme_instance = meme.one_or_none()  # type: ignore
-    if not meme_instance:
-        raise HTTPException(status_code=404, detail="Meme not found")
+    meme_query = session.query(Meme).where(Meme.id == meme.id)
     meme_data_dict = meme_data.model_dump()
-    # meme_data_dict["image"] = image
-    meme.update(meme_data_dict)  # type: ignore
+    meme_data_dict["image"] = image
+    meme_query.update(meme_data_dict)  # type: ignore
     session.commit()
-    session.refresh(meme_instance)
-    return meme_instance
+    session.refresh(meme)
+    return meme
 
 
-def delete_meme(session: Session, meme_id: int):
-    meme = get_meme_by_id_or_error(session, meme_id)
+def delete_meme(session: Session, meme: Meme):
     session.delete(meme)
     session.commit()

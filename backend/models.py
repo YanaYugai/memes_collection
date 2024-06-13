@@ -7,5 +7,5 @@ class Meme(Base):
     __tablename__ = "memes"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    # image: Mapped[str]
+    image: Mapped[str]
     text: Mapped[str]
