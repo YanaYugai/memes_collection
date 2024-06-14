@@ -79,6 +79,33 @@ def test_post_meme(
         assert "image" in response_data
 
 
+def test_post_meme_without_text(
+    client,
+) -> None:
+    with open("carbon felt.jpg", "rb") as image:
+        response = client.post(
+            url="/memes/",
+            files={"image": image},
+        )
+        assert response.status_code == http.HTTPStatus.UNPROCESSABLE_ENTITY
+
+
+def test_download_meme(
+    client,
+) -> None:
+    text = random_lower_string()
+    data = {"data": json.dumps({"text": text})}
+    with open("carbon felt.jpg", "rb") as image:
+        response = client.post(
+            url="/memes/",
+            data=data,
+            files={"image": image},
+        )
+        response_data = response.json()
+    response_image = client.get(f'{response_data["image"]}')
+    assert response_image.status_code == http.HTTPStatus.OK
+
+
 def test_update_meme(client):
     meme = create_random_meme(client=client)
     new_text = random_lower_string()
