@@ -21,24 +21,20 @@ def create_random_meme(client) -> dict[str, str]:
     return response_data
 
 
-def test_get_memes(
+def test_paginator(
     client,
 ):
+    params = {"size": 2}
     response = client.get(
         url="/memes/",
+        params=params,
     )
     content = response.json()
-    len_memes_before = len(content)
     assert response.status_code == 200
-    for _ in range(5):
-        create_random_meme(client)
-    response_after = client.get(
-        url="/memes/",
-    )
-    content_after = response_after.json()
-    len_memes_after = len(content_after)
-    assert response.status_code == 200
-    assert (len_memes_after - len_memes_before) == 5
+    assert "items" in content
+    assert "total" in content
+    assert "page" in content
+    assert "pages" in content
 
 
 def test_get_meme(
@@ -153,3 +149,24 @@ def test_delete_meme(
     meme = create_random_meme(client=client)
     response = client.delete(url=f"/memes/{meme['id']}/")
     assert response.status_code == http.HTTPStatus.NO_CONTENT
+
+
+def test_get_memes(
+    client,
+):
+    params = {"size": 2}
+    response = client.get(
+        url="/memes/",
+        params=params,
+    )
+    content = response.json()
+    len_memes_before = content["total"]
+    for _ in range(5):
+        create_random_meme(client)
+    response_after = client.get(
+        url="/memes/",
+        params=params,
+    )
+    len_memes_after = response_after.json()["total"]
+    assert response_after.status_code == 200
+    assert (len_memes_after - len_memes_before) == 5
