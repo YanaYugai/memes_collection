@@ -2,10 +2,12 @@ import os
 from typing import Annotated, cast
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, FastAPI, UploadFile
+from fastapi_pagination import Page, add_pagination, paginate
 from starlette.responses import StreamingResponse
 
-from backend.app.schemas import MemePostModel, MemePostResponseModel, checker
+from backend.app.schemas import MemePostModel, MemePostResponseModel
+from backend.app.utils import check_content_type, checker
 from backend.crud import (
     create_meme,
     delete_meme,
@@ -14,7 +16,7 @@ from backend.crud import (
     put_meme,
 )
 from backend.database import AnnotatedSession
-from backend.images.minio import MinioHandler
+from backend.minio_api.minio_handler import MinioHandler
 
 load_dotenv()
 
@@ -30,17 +32,15 @@ app = FastAPI()
 router = APIRouter(prefix="/memes")
 
 
-def check_content_type(image: UploadFile):
-    if image.content_type not in ["image/png", "image/jpeg", "image/tiff"]:
-        raise HTTPException(400, detail="Invalid document type")
-    return image
-
-
 Image = Annotated[UploadFile, Depends(check_content_type)]
 
 
 minio_handler = MinioHandler(
-    ENDPOINT, API_ENDPOINT, ACCESS_KEY, SECRET_KEY, BUCKET
+    ENDPOINT,
+    API_ENDPOINT,
+    ACCESS_KEY,
+    SECRET_KEY,
+    BUCKET,
 )
 
 
@@ -51,8 +51,9 @@ def get_meme_by_id(session: AnnotatedSession, meme_id: int):
 
 
 @router.get("/")
-def retrieve_memes(session: AnnotatedSession):
-    return get_memes(session=session)
+def retrieve_memes(session: AnnotatedSession) -> Page[MemePostResponseModel]:
+    memes = get_memes(session=session)
+    return paginate(memes)
 
 
 @router.post("/", response_model=MemePostResponseModel)
@@ -97,3 +98,4 @@ async def download(temp_link: str):
 
 
 app.include_router(router)
+add_pagination(app)
