@@ -37,7 +37,7 @@ jobs:
       - name: Sleep for 10
         run: sleep 10
       - name: Create the dev bucket
-        run: ./mc config host add myminio http://localhost:9000 developper_minio admindev_minio && ./mc mb myminio/dev-bucket
+        run: ./mc config host add myminio http://s3:9000 developper_minio admindev_minio && ./mc mb myminio/dev-bucket
       - name: Remove mc client
         run: rm -v ./mc
       - name: Check out code
@@ -55,11 +55,9 @@ jobs:
           touch .env
           echo ENDPOINT=minio:9000 >> .env
           echo API_ENDPOINT=${{ secrets.API_ENDPOINT }} >> .env
-          echo ACCESS_KEY=minio_dev >> .env
-          echo SECRET_KEY=minio_password_dev >> .env
+          echo ACCESS_KEY=developper_minio >> .env
+          echo SECRET_KEY=admindev_minio >> .env
           echo BUCKET=dev-bucket >> .env
           cat .env
-          cd backend/
-          cd ..
-          cd tests/
+          cd backend/tests/
           python -m pytest
