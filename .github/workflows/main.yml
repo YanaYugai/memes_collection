@@ -28,12 +28,12 @@ jobs:
         options: --health-cmd "curl -s http://localhost:9000/minio/health/live"
         env:
             MINIO_ROOT_USER: dev
-            MINIO_ROOT_PASSWORD: admindev
+            MINIO_ROOT_PASSWORD: admindev_minio
     steps:
       - name: Fetch mc client
         run: curl -o ./mc -# https://dl.min.io/client/mc/release/linux-amd64/mc && chmod +x ./mc
       - name: Create the dev bucket
-        run: ./mc alias set minio http://s3:9000 dev admindev && ./mc mb minio/dev-bucket
+        run: ./mc alias set minio http://s3:9000 dev admindev_minio && ./mc mb minio/dev-bucket
       - name: Remove mc client
         run: rm -v ./mc
       - name: Fetch mc client
