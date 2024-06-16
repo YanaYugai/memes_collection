@@ -31,7 +31,6 @@ app = FastAPI()
 
 router = APIRouter(prefix="/memes")
 
-
 Image = Annotated[UploadFile, Depends(check_content_type)]
 
 

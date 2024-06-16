@@ -27,7 +27,7 @@ class MinioHandler:
         self.endpoint_api = api_endpoint
         self.secure = secure
 
-    def decode_token(self, token):
+    def decode_token(self, token: str):
         try:
             return jwt.decode(
                 token,

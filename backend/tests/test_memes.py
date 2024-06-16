@@ -2,12 +2,14 @@ import http
 import random
 import string
 
+from fastapi.testclient import TestClient
+
 
 def random_lower_string() -> str:
     return "".join(random.choices(string.ascii_lowercase, k=32))
 
 
-def create_random_meme(client) -> dict[str, str]:
+def create_random_meme(client: TestClient) -> dict[str, str]:
     text = random_lower_string()
     data = {"text": text}
     with open("test.jpg", "rb") as image:
@@ -21,7 +23,7 @@ def create_random_meme(client) -> dict[str, str]:
 
 
 def test_paginator(
-    client,
+    client: TestClient,
 ):
     params = {"size": 2}
     response = client.get(
@@ -37,7 +39,7 @@ def test_paginator(
 
 
 def test_get_meme(
-    client,
+    client: TestClient,
 ) -> None:
     meme = create_random_meme(client=client)
     response = client.get(url=f"/memes/{meme['id']}/")
@@ -48,7 +50,7 @@ def test_get_meme(
 
 
 def test_get_meme_not_found(
-    client,
+    client: TestClient,
 ) -> None:
     response = client.get(url="/memes/999/")
     response_data = response.json()
@@ -57,7 +59,7 @@ def test_get_meme_not_found(
 
 
 def test_post_meme(
-    client,
+    client: TestClient,
 ) -> None:
     text = random_lower_string()
     data = {"text": text}
@@ -75,7 +77,7 @@ def test_post_meme(
 
 
 def test_post_meme_without_text(
-    client,
+    client: TestClient,
 ) -> None:
     with open("test.jpg", "rb") as image:
         response = client.post(
@@ -86,7 +88,7 @@ def test_post_meme_without_text(
 
 
 def test_download_meme(
-    client,
+    client: TestClient,
 ) -> None:
     text = random_lower_string()
     data = {"text": text}
@@ -101,7 +103,7 @@ def test_download_meme(
     assert response_image.status_code == http.HTTPStatus.OK
 
 
-def test_update_meme(client):
+def test_update_meme(client: TestClient):
     meme = create_random_meme(client=client)
     new_text = random_lower_string()
     data = {"text": new_text}
@@ -118,7 +120,7 @@ def test_update_meme(client):
 
 
 def test_update_meme_not_found(
-    client,
+    client: TestClient,
 ) -> None:
     new_text = random_lower_string()
     data = {"text": new_text}
@@ -134,7 +136,7 @@ def test_update_meme_not_found(
 
 
 def test_delete_meme_not_found(
-    client,
+    client: TestClient,
 ) -> None:
     response = client.delete(url="/memes/999/")
     response_data = response.json()
@@ -143,7 +145,7 @@ def test_delete_meme_not_found(
 
 
 def test_delete_meme(
-    client,
+    client: TestClient,
 ) -> None:
     meme = create_random_meme(client=client)
     response = client.delete(url=f"/memes/{meme['id']}/")
@@ -151,7 +153,7 @@ def test_delete_meme(
 
 
 def test_get_memes(
-    client,
+    client: TestClient,
 ):
     params = {"size": 2}
     response = client.get(
