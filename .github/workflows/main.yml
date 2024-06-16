@@ -25,6 +25,8 @@ jobs:
     services:
       s3:
         image: minio/minio:edge-cicd
+        ports:
+        - 9000:9000
         options: --health-cmd "curl -s http://localhost:9000/minio/health/live"
         env:
             MINIO_ROOT_USER: developper_minio
