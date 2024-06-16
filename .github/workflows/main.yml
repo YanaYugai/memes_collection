@@ -30,14 +30,15 @@ jobs:
     services:
       minio:
         image:
-          name: minio/mc
-          entrypoint: ['']
+          name: lazybit/minio
+        ports:
+          - 9000:9000
         env:
           MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
           MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
-        script:
-          - mc alias set minio ${{ secrets.ENDPOINT }} ${{ secrets.MINIO_ROOT_USER }} ${{ secrets.MINIO_ROOT_PASSWORD }}
-          - mc mb minio/${{ secrets.BUCKET }}
+        volumes:
+          - ${{ github.workspace }}/data:/data
+        options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
     steps:
     - name: Check out code
       uses: actions/checkout@v3
@@ -58,6 +59,20 @@ jobs:
         echo SECRET_KEY=${{MINIO_ROOT_PASSWORD}} >> .env
         echo BUCKET=${{ secrets.BUCKET }} >> .env
         cat .env
+        from minio import Minio
+            from minio.error import ResponseError
+
+            try:
+                minio = Minio(
+                    'localhost:9000',
+                    access_key='${{ secrets.MINIO_ACCESS_KEY }}',
+                    secret_key='${{ secrets.MINIO_SECRET_KEY }}',
+                    secure=False
+                )
+            except Exception as ex:
+                raise
+
+            minio.make_bucket(BUCKET)
         cd backend/
         cd ..
         cd tests/
