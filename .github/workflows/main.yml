@@ -29,21 +29,17 @@ jobs:
     runs-on: ubuntu-latest
     services:
       minio:
-        image: minio/minio:latest
-        command: server --console-address ":9001" /data/
-        ports:
-          - "9000:9000"
-          - "9001:9001"
-        environment:
+        image:
+          name: minio/mc
+          entrypoint: ['']
+        stage: deploy
+        env:
           MINIO_ROOT_USER: ${{MINIO_ROOT_USER}}
           MINIO_ROOT_PASSWORD: ${{MINIO_ROOT_PASSWORD}}
-        volumes:
-          - minio-storage:/data
-        healthcheck:
-          test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-          interval: 30s
-          timeout: 20s
-          retries: 3
+        before_script:
+          - mc alias set minio ${{ secrets.ENDPOINT }} ${{MINIO_ROOT_USER}} ${{MINIO_ROOT_PASSWORD}}
+        script:
+          - mc mb minio/${{ secrets.BUCKET }}
     steps:
     - name: Check out code
       uses: actions/checkout@v3
@@ -60,8 +56,8 @@ jobs:
         touch .env
         echo ENDPOINT=${{ secrets.ENDPOINT }} >> .env
         echo API_ENDPOINT=${{ secrets.API_ENDPOINT }} >> .env
-        echo ACCESS_KEY=${{ secrets.ACCESS_KEY }} >> .env
-        echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+        echo ACCESS_KEY=${{MINIO_ROOT_USER}} >> .env
+        echo SECRET_KEY=${{MINIO_ROOT_PASSWORD}} >> .env
         echo BUCKET=${{ secrets.BUCKET }} >> .env
         cat .env
         cd backend/
