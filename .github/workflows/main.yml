@@ -32,6 +32,8 @@ jobs:
     steps:
       - name: Fetch mc client
         run: curl -o ./mc -# https://dl.min.io/client/mc/release/linux-amd64/mc && chmod +x ./mc
+      - name: Sleep for 10
+        run: sleep 10
       - name: Create the dev bucket
         run: ./mc config host add myminio http://localhost:9000 developper_minio admindev_minio && ./mc mb myminio/dev-bucket
       - name: Remove mc client
