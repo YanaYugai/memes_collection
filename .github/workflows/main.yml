@@ -53,8 +53,8 @@ jobs:
       - name: Start tests
         run: |
           touch .env
-          echo ENDPOINT=minio:9000 >> .env
-          echo API_ENDPOINT=${{ secrets.API_ENDPOINT }} >> .env
+          echo ENDPOINT=localhost:9000 >> .env
+          echo API_ENDPOINT=localhost:8000 >> .env
           echo ACCESS_KEY=developper_minio >> .env
           echo SECRET_KEY=admindev_minio >> .env
           echo BUCKET=dev-bucket >> .env
