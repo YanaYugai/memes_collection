@@ -13,6 +13,7 @@
 * Docker
 * SQLAlchemy
 * PostgreSQL
+* SQLite
 * pre-commit
 * MinIO
 * Alembic
