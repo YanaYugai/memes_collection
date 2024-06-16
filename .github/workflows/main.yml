@@ -32,7 +32,6 @@ jobs:
         image:
           name: minio/mc
           entrypoint: ['']
-        stage: deploy
         env:
           MINIO_ROOT_USER: ${{MINIO_ROOT_USER}}
           MINIO_ROOT_PASSWORD: ${{MINIO_ROOT_PASSWORD}}
