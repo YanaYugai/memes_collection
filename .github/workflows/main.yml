@@ -23,17 +23,17 @@ jobs:
     needs: linters
     runs-on: ubuntu-latest
     services:
-      minio:
+      s3:
         image: minio/minio:edge-cicd
         options: --health-cmd "curl -s http://localhost:9000/minio/health/live"
         env:
-          MINIO_ROOT_USER: minio_user
-          MINIO_ROOT_PASSWORD: minio_password
+          MINIO_ROOT_USER: minio_dev
+          MINIO_ROOT_PASSWORD: minio_password_dev
     steps:
       - name: Fetch mc client
         run: curl -o ./mc -# https://dl.min.io/client/mc/release/linux-amd64/mc && chmod +x ./mc
       - name: Create the dev bucket
-        run: ./mc alias set minio http://minio:9000 minio_user minio_password && ./mc mb minio/dev-bucket
+        run: ./mc alias set minio http://s3:9000 minio_dev minio_password_dev && ./mc mb minio/dev-bucket
       - name: Remove mc client
         run: rm -v ./mc
       - name: Check out code
@@ -51,8 +51,8 @@ jobs:
           touch .env
           echo ENDPOINT=minio:9000 >> .env
           echo API_ENDPOINT=${{ secrets.API_ENDPOINT }} >> .env
-          echo ACCESS_KEY=minio_user >> .env
-          echo SECRET_KEY=minio_password >> .env
+          echo ACCESS_KEY=minio_dev >> .env
+          echo SECRET_KEY=minio_password_dev >> .env
           echo BUCKET=dev-bucket >> .env
           cat .env
           cd backend/
