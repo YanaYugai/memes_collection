@@ -58,6 +58,7 @@ jobs:
           echo ACCESS_KEY=developper_minio >> .env
           echo SECRET_KEY=admindev_minio >> .env
           echo BUCKET=dev-bucket >> .env
+          echo DB_PORT=5433 >> .env
           cat .env
           cd backend/tests/
           python -m pytest
