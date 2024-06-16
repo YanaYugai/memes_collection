@@ -7,9 +7,9 @@ from fastapi_pagination import add_pagination
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from backend import models
-from backend.app.main import router
-from backend.database import get_db
+import models
+from app.main import router
+from database import get_db
 
 TEST_SQL_DB = "sqlite:///./test_db.db"
 

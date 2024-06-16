@@ -1,5 +1,4 @@
 import http
-import json
 import random
 import string
 
@@ -10,8 +9,8 @@ def random_lower_string() -> str:
 
 def create_random_meme(client) -> dict[str, str]:
     text = random_lower_string()
-    data = {"data": json.dumps({"text": text})}
-    with open("carbon felt.jpg", "rb") as image:
+    data = {"text": text}
+    with open("test.jpg", "rb") as image:
         response = client.post(
             url="/memes/",
             data=data,
@@ -61,8 +60,8 @@ def test_post_meme(
     client,
 ) -> None:
     text = random_lower_string()
-    data = {"data": json.dumps({"text": text})}
-    with open("carbon felt.jpg", "rb") as image:
+    data = {"text": text}
+    with open("test.jpg", "rb") as image:
         response = client.post(
             url="/memes/",
             data=data,
@@ -78,7 +77,7 @@ def test_post_meme(
 def test_post_meme_without_text(
     client,
 ) -> None:
-    with open("carbon felt.jpg", "rb") as image:
+    with open("test.jpg", "rb") as image:
         response = client.post(
             url="/memes/",
             files={"image": image},
@@ -90,8 +89,8 @@ def test_download_meme(
     client,
 ) -> None:
     text = random_lower_string()
-    data = {"data": json.dumps({"text": text})}
-    with open("carbon felt.jpg", "rb") as image:
+    data = {"text": text}
+    with open("test.jpg", "rb") as image:
         response = client.post(
             url="/memes/",
             data=data,
@@ -105,8 +104,8 @@ def test_download_meme(
 def test_update_meme(client):
     meme = create_random_meme(client=client)
     new_text = random_lower_string()
-    data = {"data": json.dumps({"text": new_text})}
-    with open("fibers.png", "rb") as image:
+    data = {"text": new_text}
+    with open("test2.png", "rb") as image:
         response = client.put(
             url=f"/memes/{meme['id']}/",
             data=data,
@@ -122,8 +121,8 @@ def test_update_meme_not_found(
     client,
 ) -> None:
     new_text = random_lower_string()
-    data = {"data": json.dumps({"text": new_text})}
-    with open("fibers.png", "rb") as image:
+    data = {"text": new_text}
+    with open("test2.png", "rb") as image:
         response = client.put(
             url="/memes/999/",
             data=data,
