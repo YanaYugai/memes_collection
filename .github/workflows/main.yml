@@ -55,8 +55,8 @@ jobs:
         touch .env
         echo ENDPOINT=${{ secrets.ENDPOINT }} >> .env
         echo API_ENDPOINT=${{ secrets.API_ENDPOINT }} >> .env
-        echo ACCESS_KEY=${{MINIO_ROOT_USER}} >> .env
-        echo SECRET_KEY=${{MINIO_ROOT_PASSWORD}} >> .env
+        echo ACCESS_KEY=${{ secrets.MINIO_ROOT_USER }} >> .env
+        echo SECRET_KEY=${{ secrets.MINIO_ROOT_PASSWORD }} >> .env
         echo BUCKET=${{ secrets.BUCKET }} >> .env
         cat .env
         from minio import Minio
