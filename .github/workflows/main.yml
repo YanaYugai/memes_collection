@@ -27,19 +27,13 @@ jobs:
         image: minio/minio:edge-cicd
         options: --health-cmd "curl -s http://localhost:9000/minio/health/live"
         env:
-            MINIO_ROOT_USER: developper
+            MINIO_ROOT_USER: developper_minio
             MINIO_ROOT_PASSWORD: admindev_minio
     steps:
       - name: Fetch mc client
         run: curl -o ./mc -# https://dl.min.io/client/mc/release/linux-amd64/mc && chmod +x ./mc
       - name: Create the dev bucket
-        run: ./mc config host add myminio http://s3:9000 developper admindev_minio && ./mc mb myminio/dev-bucket
-      - name: Remove mc client
-        run: rm -v ./mc
-      - name: Fetch mc client
-        run: curl -o ./mc -# https://dl.min.io/client/mc/release/linux-amd64/mc && chmod +x ./mc
-      - name: Create the dev bucket
-        run: ./mc alias set minio http://s3:9000 minio_dev minio_password_dev && ./mc mb minio/dev-bucket
+        run: ./mc config host add myminio http://s3:9000 developper_minio admindev_minio && ./mc mb myminio/dev-bucket
       - name: Remove mc client
         run: rm -v ./mc
       - name: Check out code
