@@ -27,13 +27,13 @@ jobs:
         image: minio/minio:edge-cicd
         options: --health-cmd "curl -s http://localhost:9000/minio/health/live"
         env:
-          MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
-          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
+          MINIO_ROOT_USER: minio_user
+          MINIO_ROOT_PASSWORD: minio_password
     steps:
       - name: Fetch mc client
         run: curl -o ./mc -# https://dl.min.io/client/mc/release/linux-amd64/mc && chmod +x ./mc
       - name: Create the dev bucket
-        run: ./mc alias set minio http://minio:9000 ${{ secrets.MINIO_ROOT_USER }} ${{ secrets.MINIO_ROOT_PASSWORD }} && ./mc mb minio/${{ secrets.BUCKET }}
+        run: ./mc alias set minio http://minio:9000 minio_user minio_password && ./mc mb minio/dev-bucket
       - name: Remove mc client
         run: rm -v ./mc
       - name: Check out code
@@ -49,11 +49,11 @@ jobs:
       - name: Start tests
         run: |
           touch .env
-          echo ENDPOINT=${{ secrets.ENDPOINT }} >> .env
+          echo ENDPOINT=minio:9000 >> .env
           echo API_ENDPOINT=${{ secrets.API_ENDPOINT }} >> .env
-          echo ACCESS_KEY=${{ secrets.MINIO_ROOT_USER }} >> .env
-          echo SECRET_KEY=${{ secrets.MINIO_ROOT_PASSWORD }} >> .env
-          echo BUCKET=${{ secrets.BUCKET }} >> .env
+          echo ACCESS_KEY=minio_user >> .env
+          echo SECRET_KEY=minio_password >> .env
+          echo BUCKET=dev-bucket >> .env
           cat .env
           cd backend/
           cd ..
