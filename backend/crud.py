@@ -2,8 +2,8 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from backend.app.schemas import MemePostModel
-from backend.models import Meme
+from app.schemas import MemePostModel
+from models import Meme
 
 
 def get_meme_by_id_or_error(session: Session, meme_id: int):

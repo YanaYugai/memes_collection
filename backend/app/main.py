@@ -6,17 +6,17 @@ from fastapi import APIRouter, Depends, FastAPI, UploadFile
 from fastapi_pagination import Page, add_pagination, paginate
 from starlette.responses import StreamingResponse
 
-from backend.app.schemas import MemePostModel, MemePostResponseModel
-from backend.app.utils import check_content_type, checker
-from backend.crud import (
+from app.schemas import MemePostModel, MemePostResponseModel
+from app.utils import check_content_type, checker
+from crud import (
     create_meme,
     delete_meme,
     get_meme_by_id_or_error,
     get_memes,
     put_meme,
 )
-from backend.database import AnnotatedSession
-from backend.minio_api.minio_handler import MinioHandler
+from database import AnnotatedSession
+from minio_api.minio_handler import MinioHandler
 
 load_dotenv()
 
@@ -93,7 +93,7 @@ async def download(temp_link: str):
     filename = decoded_jwt['filename']
     return StreamingResponse(
         minio_handler.download_file(filename),
-        media_type='application/octet-stream',
+        media_type='image/png',
     )
 
 
