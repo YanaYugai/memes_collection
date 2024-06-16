@@ -35,9 +35,8 @@ jobs:
         env:
           MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
           MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
-        before_script:
-          - mc alias set minio ${{ secrets.ENDPOINT }} ${{ secrets.MINIO_ROOT_USER }} ${{ secrets.MINIO_ROOT_PASSWORD }}
         script:
+          - mc alias set minio ${{ secrets.ENDPOINT }} ${{ secrets.MINIO_ROOT_USER }} ${{ secrets.MINIO_ROOT_PASSWORD }}
           - mc mb minio/${{ secrets.BUCKET }}
     steps:
     - name: Check out code
