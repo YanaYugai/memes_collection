@@ -22,8 +22,8 @@ load_dotenv()
 
 ENDPOINT = cast(str, os.getenv("ENDPOINT"))
 API_ENDPOINT = cast(str, os.getenv("API_ENDPOINT"))
-ACCESS_KEY = cast(str, os.getenv("ACCESS_KEY"))
-SECRET_KEY = cast(str, os.getenv("SECRET_KEY"))
+ACCESS_KEY = cast(str, os.getenv("MINIO_ROOT_USER"))
+SECRET_KEY = cast(str, os.getenv("MINIO_ROOT_PASSWORD"))
 BUCKET = cast(str, os.getenv("BUCKET"))
 
 
