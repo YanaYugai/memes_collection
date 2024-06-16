@@ -33,10 +33,10 @@ jobs:
           name: minio/mc
           entrypoint: ['']
         env:
-          MINIO_ROOT_USER: ${{MINIO_ROOT_USER}}
-          MINIO_ROOT_PASSWORD: ${{MINIO_ROOT_PASSWORD}}
+          MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
+          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         before_script:
-          - mc alias set minio ${{ secrets.ENDPOINT }} ${{MINIO_ROOT_USER}} ${{MINIO_ROOT_PASSWORD}}
+          - mc alias set minio ${{ secrets.ENDPOINT }} ${{ secrets.MINIO_ROOT_USER }} ${{ secrets.MINIO_ROOT_PASSWORD }}
         script:
           - mc mb minio/${{ secrets.BUCKET }}
     steps:
