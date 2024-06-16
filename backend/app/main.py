@@ -17,6 +17,7 @@ from crud import (
 )
 from database import AnnotatedSession
 from minio_api.minio_handler import MinioHandler
+from models import Meme
 
 load_dotenv()
 
@@ -43,8 +44,11 @@ minio_handler = MinioHandler(
 )
 
 
-@router.get("/{meme_id}/")
-def get_meme_by_id(session: AnnotatedSession, meme_id: int):
+@router.get("/{meme_id}/", response_model=MemePostResponseModel)
+def get_meme_by_id(
+    session: AnnotatedSession,
+    meme_id: int,
+) -> Meme:
     meme = get_meme_by_id_or_error(session=session, meme_id=meme_id)
     return meme
 
@@ -60,19 +64,19 @@ def post_meme(
     session: AnnotatedSession,
     file: Image,
     text: MemePostModel = Depends(checker),
-):
+) -> Meme:
     url = minio_handler.put_file(file.filename, file.file, file.size)
     meme = create_meme(session=session, meme_data=text, image=url)
     return meme
 
 
-@router.put("/{meme_id}/")
+@router.put("/{meme_id}/", response_model=MemePostResponseModel)
 def change_meme(
     session: AnnotatedSession,
     meme_id: int,
     file: Image,
     text: MemePostModel = Depends(checker),
-):
+) -> Meme:
     meme = get_meme_by_id_or_error(session=session, meme_id=meme_id)
     minio_handler.remove_file(meme.image)
     url = minio_handler.put_file(file.filename, file.file, file.size)
@@ -80,7 +84,10 @@ def change_meme(
 
 
 @router.delete("/{meme_id}/", status_code=204)
-def delete_meme_api(session: AnnotatedSession, meme_id: int):
+def delete_meme_api(
+    session: AnnotatedSession,
+    meme_id: int,
+) -> None:
     meme = get_meme_by_id_or_error(session=session, meme_id=meme_id)
     minio_handler.remove_file(meme.image)
     delete_meme(session=session, meme=meme)
