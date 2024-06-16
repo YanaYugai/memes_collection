@@ -55,8 +55,8 @@ jobs:
           touch .env
           echo ENDPOINT=localhost:9000 >> .env
           echo API_ENDPOINT=localhost:8000 >> .env
-          echo ACCESS_KEY=developper_minio >> .env
-          echo SECRET_KEY=admindev_minio >> .env
+          echo MINIO_ROOT_USER=developper_minio >> .env
+          echo MINIO_ROOT_PASSWORD=admindev_minio >> .env
           echo JWT_SECRET=jwttoken-secret-key >> .env
           echo BUCKET=dev-bucket >> .env
           echo DB_PORT=5433 >> .env
