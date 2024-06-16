@@ -1,0 +1,70 @@
+name: Main Foodgram Workflow
+on:
+  push:
+    branches:
+      - master
+jobs:
+  linters:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r ./backend/requirements.txt
+    - name: Check with flake8
+      run: python -m flake8 --exclude backend/alembic/ backend/
+    - name: Check with mypy
+      run: |
+        python -m pip install types-psycopg2
+        python -m pip install types-fpdf2
+        python -m mypy --exclude backend/alembic/ backend/
+  tests:
+    needs: linters
+    runs-on: ubuntu-latest
+    services:
+      minio:
+        image: minio/minio:latest
+        command: server --console-address ":9001" /data/
+        ports:
+          - "9000:9000"
+          - "9001:9001"
+        environment:
+          MINIO_ROOT_USER: ${{MINIO_ROOT_USER}}
+          MINIO_ROOT_PASSWORD: ${{MINIO_ROOT_PASSWORD}}
+        volumes:
+          - minio-storage:/data
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+          interval: 30s
+          timeout: 20s
+          retries: 3
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r ./backend/requirements.txt
+    - name: Start tests
+      run: |
+        touch .env
+        echo ENDPOINT=${{ secrets.ENDPOINT }} >> .env
+        echo API_ENDPOINT=${{ secrets.API_ENDPOINT }} >> .env
+        echo ACCESS_KEY=${{ secrets.ACCESS_KEY }} >> .env
+        echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+        echo BUCKET=${{ secrets.BUCKET }} >> .env
+        cat .env
+        cd backend/
+        cd ..
+        cd tests/
+        python -m pytest
